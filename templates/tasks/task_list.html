@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="d-flex align-items-center">
+    TODO list
+    <a href="{% url 'tasks:task-create' %}" class="btn btn-primary link-to-page ml-auto">
+      Add task
+    </a>
+  </h1>
+  {% if task_list %}
+    <ul class="list-group">
+      {% for task in task_list %}
+        <li class="list-group-item">
+          <h3 class="d-flex align-items-center">
+            <strong>{{ task.content }}</strong>
+            {% if task.is_done %}
+              <p class="text-success mb-0 ml-2">Done</p>
+              <form method="post" action="{% url 'tasks:task-update-isdone' task.id %}" class="ml-auto">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Undo</button>
+              </form>
+            {% else %}
+              <p class="text-danger mb-0 ml-2">Not done</p>
+              <form method="post" action="{% url 'tasks:task-update-isdone' task.id %}" class="ml-auto">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Complete</button>
+              </form>
+            {% endif %}
+          </h3>
+          <p>Created: {{ task.created_at }}</p>
+          <p>Deadline: {{ task.deadline }}</p>
+          <h4 class="text-secondary">
+            Tags: {% for tag in task.tags.all %}{{ tag.name }} {% endfor %}
+            <a class="link-primary" href="{% url 'tasks:task-update' task.id %}">Update</a>
+            <a class="link-primary" href="{% url 'tasks:task-delete' task.id %}">Delete</a>
+          </h4>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no tasks yet</p>
+  {% endif %}
+{% endblock %}
